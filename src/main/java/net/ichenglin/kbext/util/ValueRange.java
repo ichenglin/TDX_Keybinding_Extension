@@ -1,3 +1,5 @@
+package net.ichenglin.kbext.util;
+
 public class ValueRange implements Comparable<ValueRange> {
 
     private int range_minimum;

@@ -1,4 +1,10 @@
+package net.ichenglin.kbext;
+
 import com.sun.jna.platform.win32.User32;
+import net.ichenglin.kbext.extension.KeybindingHotkey;
+import net.ichenglin.kbext.extension.KeybindingInterface;
+import net.ichenglin.kbext.extension.KeybindingRobot;
+import net.ichenglin.kbext.extension.KeybindingWindow;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
