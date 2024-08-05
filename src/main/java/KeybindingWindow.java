@@ -1,33 +1,38 @@
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinDef.RECT;
 
-import javax.swing.*;
+import java.awt.*;
 
 public class KeybindingWindow {
 
-    private final JFrame extension_window;
+    private final HWND window_handle;
 
-    public KeybindingWindow() {
-        this.extension_window = new JFrame();
-        this.window_initialize();
+    public KeybindingWindow(HWND window_handle) {
+        this.window_handle = window_handle;
     }
 
-    public boolean roblox_focused() {
-        HWND   focused_window      = User32.INSTANCE.GetForegroundWindow();
-        int    focused_name_length = User32.INSTANCE.GetWindowTextLength(focused_window) + 1;
-        char[] focused_name_buffer = new char[focused_name_length];
-        User32.INSTANCE.GetWindowText(focused_window, focused_name_buffer, focused_name_length);
-        return Native.toString(focused_name_buffer).equals("Roblox");
+    public String get_name() {
+        int    window_name_length = User32.INSTANCE.GetWindowTextLength(this.window_handle) + 1;
+        char[] window_name_buffer = new char[window_name_length];
+        User32.INSTANCE.GetWindowText(this.window_handle, window_name_buffer, window_name_length);
+        return Native.toString(window_name_buffer);
     }
 
-    private void window_initialize() {
-        this.extension_window.setSize                 (400, 200);
-        this.extension_window.setTitle                ("TDX Keybinding Extension");
-        this.extension_window.setResizable            (false);
-        this.extension_window.setAlwaysOnTop          (true);
-        this.extension_window.setVisible              (true);
-        this.extension_window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public Rectangle get_bounds() {
+        RECT window_rectangle = new RECT();
+        // ignores window shadow unlike User32 GetWindowRect
+        DwmApi.INSTANCE.DwmGetWindowAttribute(this.window_handle, DwmApi.DWMWA_EXTENDED_FRAME_BOUNDS, window_rectangle, window_rectangle.size());
+        int window_rectangle_x      = window_rectangle.left;
+        int window_rectangle_y      = window_rectangle.top;
+        int window_rectangle_width  = (window_rectangle.right  - window_rectangle.left);
+        int window_rectangle_height = (window_rectangle.bottom - window_rectangle.top);
+        return new Rectangle(window_rectangle_x, window_rectangle_y, window_rectangle_width, window_rectangle_height);
     }
 
+    public static KeybindingWindow window_focused() {
+        HWND focused_window = User32.INSTANCE.GetForegroundWindow();
+        return new KeybindingWindow(focused_window);
+    }
 }
