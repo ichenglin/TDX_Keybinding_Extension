@@ -36,7 +36,7 @@ public class KeybindingRecognition {
             BufferedImage image_filtered = KeybindingRecognition.transform_monochrome(image_cropped);
             return this.recognition_instance.doOCR(image_filtered);
         } catch (TesseractException exception) {
-            throw new RecognitionException("Failed to recognize text");
+            throw new RecognitionException("err_txt");
         }
     }
 
@@ -67,7 +67,7 @@ public class KeybindingRecognition {
                     KeybindingRecognition.parse_time(round_timer)
             );
         } catch (NumberFormatException exception) {
-            throw new RecognitionException("Failed to recognize game state");
+            throw new RecognitionException("err_ste");
         }
     }
 
@@ -86,7 +86,7 @@ public class KeybindingRecognition {
             if (neighbor_occurrence.compareTo(occurrence_best) > 0) occurrence_best = neighbor_occurrence;
         }
         ArrayList<Integer> occurrence_list = occurrence_best.get_occurrence();
-        if (occurrence_list.isEmpty()) throw new RecognitionException("Failed to locate scoreboard");
+        if (occurrence_list.isEmpty()) throw new RecognitionException("err_loc");
         int scoreboard_width  = occurrence_best.get_length();
         int scoreboard_height = occurrence_list.get(occurrence_list.size() - 1);
         int scoreboard_x      = (recognition_width_center - (scoreboard_width / 2));

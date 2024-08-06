@@ -39,16 +39,16 @@ public class KeybindingExtension {
         try {
             KeybindingWindow window_focused    = KeybindingWindow.window_focused();
             BufferedImage    window_screenshot = Extension.extension_robot.screenshot_capture(window_focused.get_bounds());
+            Extension.extension_registry   .set_data ("ext_wnd", window_focused);
             Extension.extension_recognition.set_image(window_screenshot);
             Extension.extension_gamestate = Extension.extension_recognition.recognize_state();
             // registry update
             Extension.extension_registry.set_data("rnd_hp",   Extension.extension_gamestate.get_health());
             Extension.extension_registry.set_data("rnd_wave", Extension.extension_gamestate.get_wave());
             Extension.extension_registry.set_data("rnd_cdn",  Extension.extension_gamestate.get_timer());
-            Extension.extension_registry.set_data("ext_ocr",  true);
+            Extension.extension_registry.set_data("ext_ocr",  "success");
         } catch (RecognitionException exception) {
-            Extension.extension_registry.set_data("ext_ocr", false);
-            System.out.println("Recognition Error: " + exception.getMessage());
+            Extension.extension_registry.set_data("ext_ocr", exception.getMessage());
         }
     }
 }

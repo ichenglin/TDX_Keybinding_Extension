@@ -40,4 +40,16 @@ public class KeybindingWindow {
         HWND focused_window = User32.INSTANCE.GetForegroundWindow();
         return new KeybindingWindow(focused_window);
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof KeybindingWindow)) return false;
+        KeybindingWindow object_window = (KeybindingWindow) object;
+        return (object_window.window_handle.equals(this.window_handle));
+    }
+
+    @Override
+    public String toString() {
+        return this.get_name();
+    }
 }
