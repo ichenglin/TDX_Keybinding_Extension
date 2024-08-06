@@ -21,6 +21,10 @@ public class ValueRange implements Comparable<ValueRange> {
         this.range_maximum = range_maximum;
     }
 
+    public boolean check_within(int candidate) {
+        return (this.range_minimum <= candidate) && (candidate <= this.range_maximum);
+    }
+
     public ValueRange get_copy() {
         return new ValueRange(this.range_minimum, this.range_maximum);
     }

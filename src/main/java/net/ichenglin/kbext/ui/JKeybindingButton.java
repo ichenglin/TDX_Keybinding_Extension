@@ -1,5 +1,7 @@
 package net.ichenglin.kbext.ui;
 
+import net.ichenglin.kbext.util.ValueRange;
+
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,16 +9,18 @@ import java.util.function.Consumer;
 
 public class JKeybindingButton extends JToggleButton {
 
-    private char keybinding_selected;
+    private int keycode_selected;
 
-    public JKeybindingButton(char keybinding_selected) {
+    public JKeybindingButton(int keycode_selected) {
         super.addActionListener((action_event) -> {
             super.addKeyListener(new LocalKeyListener((key_event) -> {
-                this.keybinding_update(key_event.getKeyChar());
+                int keycode_new = key_event.getExtendedKeyCode();
+                if (!this.keybinding_valid(keycode_new)) return;
+                this.keybinding_update(keycode_new);
                 super.removeKeyListener(this.getKeyListeners()[0]);
             }));
         });
-        this.keybinding_update(keybinding_selected);
+        this.keybinding_update(keycode_selected);
     }
 
     public void addKeybindingListener(KeybindingListener keybinding_listener) {
@@ -31,12 +35,18 @@ public class JKeybindingButton extends JToggleButton {
         }
     }
 
-    private void keybinding_update(char keybinding_selected) {
-        char keybinding_old      = this.keybinding_selected;
-        this.keybinding_selected = Character.toLowerCase(keybinding_selected);
-        this.setText(Character.toString(Character.toUpperCase(keybinding_selected)));
+    private boolean keybinding_valid(int keycode_selected) {
+        boolean keycode_number    = new ValueRange(KeyEvent.VK_0, KeyEvent.VK_9).check_within(keycode_selected);
+        boolean keycode_character = new ValueRange(KeyEvent.VK_A, KeyEvent.VK_Z).check_within(keycode_selected);
+        return (keycode_number || keycode_character);
+    }
+
+    private void keybinding_update(int keycode_selected) {
+        int keycode_old       = this.keycode_selected;
+        this.keycode_selected = keycode_selected;
+        this.setText(Character.toString((char) keycode_selected));
         this.setSelected(false);
-        this.keybinding_notify(new KeybindingEvent(keybinding_old, this.keybinding_selected));
+        this.keybinding_notify(new KeybindingEvent(keycode_old, keycode_selected));
     }
 }
 
@@ -49,13 +59,13 @@ class LocalKeyListener implements KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent key_event) {}
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        this.key_event.accept(e);
+    public void keyPressed(KeyEvent key_event) {
+        this.key_event.accept(key_event);
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent key_event) {}
 }
