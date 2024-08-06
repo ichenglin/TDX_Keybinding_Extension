@@ -20,10 +20,11 @@ public class JKeybindingButton extends JToggleButton {
                         int keycode_new = key_event.getExtendedKeyCode();
                         if (!this.keybinding_valid(keycode_new)) return;
                         this.keybinding_update(keycode_new);
+                        this.keylistener_clear();
                     }));
                     break;
                 case ItemEvent.DESELECTED:
-                    super.removeKeyListener(this.getKeyListeners()[0]);
+                    this.keylistener_clear();
                     break;
                 default:
                     break;
@@ -56,6 +57,10 @@ public class JKeybindingButton extends JToggleButton {
         this.setText(Character.toString((char) keycode_selected));
         this.setSelected(false);
         this.keybinding_notify(new KeybindingEvent(keycode_old, keycode_selected));
+    }
+
+    private void keylistener_clear() {
+        for (KeyListener key_listener : super.getKeyListeners()) super.removeKeyListener(key_listener);
     }
 }
 
