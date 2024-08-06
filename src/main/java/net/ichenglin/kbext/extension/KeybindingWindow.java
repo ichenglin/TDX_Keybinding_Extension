@@ -31,6 +31,8 @@ public class KeybindingWindow {
         int window_rectangle_y      = window_rectangle.top;
         int window_rectangle_width  = (window_rectangle.right  - window_rectangle.left);
         int window_rectangle_height = (window_rectangle.bottom - window_rectangle.top);
+        if (window_rectangle_width  <= 0) window_rectangle_width  = 1;
+        if (window_rectangle_height <= 0) window_rectangle_height = 1;
         return new Rectangle(window_rectangle_x, window_rectangle_y, window_rectangle_width, window_rectangle_height);
     }
 

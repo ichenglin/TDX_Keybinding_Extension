@@ -1,4 +1,4 @@
-package net.ichenglin.kbext.util;
+package net.ichenglin.kbext.object;
 
 public class ValueRange implements Comparable<ValueRange> {
 

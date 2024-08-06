@@ -1,6 +1,6 @@
 package net.ichenglin.kbext.ui;
 
-import net.ichenglin.kbext.util.ValueRange;
+import net.ichenglin.kbext.object.ValueRange;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;

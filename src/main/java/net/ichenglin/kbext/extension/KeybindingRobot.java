@@ -4,8 +4,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class KeybindingRobot {
-    private final Robot macro_robot = new Robot();
-    public KeybindingRobot() throws AWTException {};
+    private final Robot macro_robot;
+
+    public KeybindingRobot() {
+        try {
+            this.macro_robot = new Robot();
+        } catch (AWTException exception) {
+            throw new RuntimeException("Failed to initialize robot");
+        }
+    };
 
     public void upgrade_max(int primary_keycode, int secondary_keycode) {
         for (int index = 0; index < 5; index++) this.upgrade_once(primary_keycode);
