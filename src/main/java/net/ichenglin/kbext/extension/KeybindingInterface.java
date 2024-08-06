@@ -1,8 +1,11 @@
 package net.ichenglin.kbext.extension;
 
+import net.ichenglin.kbext.object.ProgramRegistry;
+import net.ichenglin.kbext.object.ProgramRegistryData;
 import net.ichenglin.kbext.ui.JKeybindingButton;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -10,8 +13,9 @@ import java.util.List;
 
 public class KeybindingInterface {
 
-    private final JFrame         extension_interface;
-    private       AutoSkipPreset extension_mode_autoskip;
+    private final JFrame          extension_interface;
+    private final ProgramRegistry extension_registry;
+    private       AutoSkipPreset  extension_mode_autoskip;
 
     private static final List<AutoSkipPreset> autoskip_presets = Arrays.asList(
             new AutoSkipPreset(0, "Easy",         24),
@@ -21,22 +25,24 @@ public class KeybindingInterface {
             new AutoSkipPreset(4, "Endless",      200)
     );
 
-    public KeybindingInterface(KeybindingHotkey keybinding_hotkey) {
+    public KeybindingInterface(KeybindingHotkey extension_hotkey, ProgramRegistry extension_registry) {
         this.extension_interface     = new JFrame();
+        this.extension_registry      = extension_registry;
         this.extension_mode_autoskip = KeybindingInterface.autoskip_presets.get(4);
         this.extension_interface.setLayout(new GridBagLayout());
         EventQueue.invokeLater(() -> {
             this.window_initialize();
             this.general_initialize();
-            this.advanced_initialize(keybinding_hotkey);
+            this.advanced_initialize(extension_hotkey);
             this.autoskip_initialize();
+            this.monitor_initialize();
         });
 
     }
 
     private void window_initialize() {
         // window
-        this.extension_interface.setSize                 (450, 300);
+        this.extension_interface.setSize                 (650, 300);
         this.extension_interface.setTitle                ("TDX Keybinding Extension");
         this.extension_interface.setResizable            (false);
         this.extension_interface.setAlwaysOnTop          (true);
@@ -135,9 +141,26 @@ public class KeybindingInterface {
             int            selected_index  = autoskip_combo.getSelectedIndex();
             this.extension_mode_autoskip   = KeybindingInterface.autoskip_presets.get(selected_index);
             autoskip_list.setListData(this.extension_mode_autoskip.get_waves_list());
+            this.extension_registry.set_data("int_wave", this.extension_mode_autoskip);
         });
         autoskip_panel.add(autoskip_combo,    this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
         autoskip_panel.add(autoskip_scroller, this.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+    }
+
+    private void monitor_initialize() {
+        // layout
+        JPanel monitor_panel = new JPanel();
+        monitor_panel.setLayout(new GridBagLayout());
+        monitor_panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Program Registry"),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        this.extension_interface.add(monitor_panel, this.gridbag_constraints(2, 0, 2, GridBagConstraints.BOTH, 0));
+        JTable       monitor_table         = new JTable(new RegistryTableModel(this.extension_registry));
+        JScrollPane  monitor_scroller      = new JScrollPane(monitor_table);
+        monitor_table.setFillsViewportHeight(true);
+        monitor_scroller.setPreferredSize   (new Dimension(150, 180));
+        monitor_panel.add(monitor_scroller, this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
     private GridBagConstraints gridbag_constraints(int grid_x, int grid_y, int grid_height, int grid_fill, int pad_right) {
@@ -148,6 +171,65 @@ public class KeybindingInterface {
         layout_constraints.fill       = grid_fill;
         layout_constraints.insets     = new Insets(2, 3, 2, 3 + pad_right);
         return layout_constraints;
+    }
+}
+
+class RegistryTableModel extends AbstractTableModel {
+
+    private final ProgramRegistry extension_registry;
+    private       int             extension_registry_cache = -1;
+
+    public RegistryTableModel(ProgramRegistry extension_registry) {
+        this.extension_registry = extension_registry;
+        this.extension_registry.add_listener((registry_event) -> {
+            ProgramRegistryData[] registry_data = this.extension_registry.get_all();
+            boolean registry_new = (registry_data.length != extension_registry_cache);
+            // update whole table
+            if (registry_new) {
+                super.fireTableDataChanged();
+                return;
+            }
+            // update changed rows
+            for (int data_index = 0; data_index < registry_data.length; data_index++) {
+                if (!registry_data[data_index].get_key().equals(registry_event.get_key())) continue;
+                super.fireTableRowsUpdated(data_index, data_index);
+                break;
+            }
+        });
+    }
+
+    @Override
+    public int getRowCount() {
+        return extension_registry.get_all().length;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 2;
+    }
+
+    @Override
+    public String getColumnName(int index_column) {
+        if      (index_column == 0) return "Property";
+        else if (index_column == 1) return "Value";
+        return null;
+    }
+
+    @Override
+    public Object getValueAt(int index_row, int index_column) {
+        ProgramRegistryData registry_data = this.extension_registry.get_all()[index_row];
+        if      (index_column == 0) return RegistryTableModel.value_translate(registry_data.get_key());
+        else if (index_column == 1) return RegistryTableModel.value_translate(registry_data.get_value());
+        return null;
+    }
+
+    private static Object value_translate(Object value_original) {
+        try {
+            Class<?> stringify_class = value_original.getClass().getMethod("toString").getDeclaringClass();
+            if (stringify_class != Object.class) return value_original;
+            return "0x" + Integer.toHexString(value_original.hashCode());
+        } catch (NoSuchMethodException ignored) {}
+        return null;
     }
 }
 

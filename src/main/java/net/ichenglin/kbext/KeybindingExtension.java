@@ -3,6 +3,7 @@ package net.ichenglin.kbext;
 import com.sun.jna.platform.win32.User32;
 import net.ichenglin.kbext.extension.*;
 import net.ichenglin.kbext.object.GameState;
+import net.ichenglin.kbext.object.ProgramRegistry;
 import net.ichenglin.kbext.object.RecognitionException;
 import net.ichenglin.kbext.object.ScheduledTask;
 
@@ -26,9 +27,11 @@ public class KeybindingExtension {
             if (!KeybindingWindow.window_focused().get_name().equals("Roblox")) return;
             System.out.println("Nothing Now :(");
         });
-        Extension.extension_interface   = new KeybindingInterface(Extension.extension_hotkey);
+        Extension.extension_registry    = new ProgramRegistry();
+        Extension.extension_interface   = new KeybindingInterface(Extension.extension_hotkey, Extension.extension_registry);
         Extension.extension_recognition = new KeybindingRecognition("D:\\Github\\TDX_Keybinding_Extension\\asset");
         Extension.extension_gamestate   = new GameState(0, 0, 0);
+        Extension.extension_registry.set_data("ext_rdy", true);
         new ScheduledTask(500, () -> KeybindingExtension.task_recognition(Extension));
     }
 
@@ -38,17 +41,23 @@ public class KeybindingExtension {
             BufferedImage    window_screenshot = Extension.extension_robot.screenshot_capture(window_focused.get_bounds());
             Extension.extension_recognition.set_image(window_screenshot);
             Extension.extension_gamestate = Extension.extension_recognition.recognize_state();
-            System.out.println(Extension.extension_gamestate.get_timer() % 60);
+            // registry update
+            Extension.extension_registry.set_data("rnd_hp",   Extension.extension_gamestate.get_health());
+            Extension.extension_registry.set_data("rnd_wave", Extension.extension_gamestate.get_wave());
+            Extension.extension_registry.set_data("rnd_cdn",  Extension.extension_gamestate.get_timer());
+            Extension.extension_registry.set_data("ext_ocr",  true);
         } catch (RecognitionException exception) {
+            Extension.extension_registry.set_data("ext_ocr", false);
             System.out.println("Recognition Error: " + exception.getMessage());
         }
     }
 }
 
 class KeybindingReference {
-    public KeybindingHotkey           extension_hotkey;
-    public KeybindingRobot            extension_robot;
-    public KeybindingInterface        extension_interface;
-    public KeybindingRecognition      extension_recognition;
-    public GameState                  extension_gamestate;
+    public KeybindingHotkey      extension_hotkey;
+    public KeybindingRobot       extension_robot;
+    public KeybindingInterface   extension_interface;
+    public KeybindingRecognition extension_recognition;
+    public ProgramRegistry       extension_registry;
+    public GameState             extension_gamestate;
 }
