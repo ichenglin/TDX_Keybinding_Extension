@@ -3,6 +3,7 @@ package net.ichenglin.kbext.ui;
 import net.ichenglin.kbext.util.ValueRange;
 
 import javax.swing.*;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.function.Consumer;
@@ -12,13 +13,21 @@ public class JKeybindingButton extends JToggleButton {
     private int keycode_selected;
 
     public JKeybindingButton(int keycode_selected) {
-        super.addActionListener((action_event) -> {
-            super.addKeyListener(new LocalKeyListener((key_event) -> {
-                int keycode_new = key_event.getExtendedKeyCode();
-                if (!this.keybinding_valid(keycode_new)) return;
-                this.keybinding_update(keycode_new);
-                super.removeKeyListener(this.getKeyListeners()[0]);
-            }));
+        super.addItemListener((item_event) -> {
+            switch (item_event.getStateChange()) {
+                case ItemEvent.SELECTED:
+                    super.addKeyListener(new LocalKeyListener((key_event) -> {
+                        int keycode_new = key_event.getExtendedKeyCode();
+                        if (!this.keybinding_valid(keycode_new)) return;
+                        this.keybinding_update(keycode_new);
+                    }));
+                    break;
+                case ItemEvent.DESELECTED:
+                    super.removeKeyListener(this.getKeyListeners()[0]);
+                    break;
+                default:
+                    break;
+            }
         });
         this.keybinding_update(keycode_selected);
     }
