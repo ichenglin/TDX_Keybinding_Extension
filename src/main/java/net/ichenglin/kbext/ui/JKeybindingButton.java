@@ -6,13 +6,17 @@ import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class JKeybindingButton extends JToggleButton {
 
-    private int keycode_selected;
+    private       int       keycode_selected;
+    private final Integer[] keycode_filter;
 
-    public JKeybindingButton(int keycode_selected) {
+    public JKeybindingButton(int keycode_selected, Integer[] keycode_filter) {
+        this.keycode_filter = keycode_filter;
+        this.keybinding_update(keycode_selected);
         super.addItemListener((item_event) -> {
             switch (item_event.getStateChange()) {
                 case ItemEvent.SELECTED:
@@ -30,7 +34,6 @@ public class JKeybindingButton extends JToggleButton {
                     break;
             }
         });
-        this.keybinding_update(keycode_selected);
     }
 
     public void addKeybindingListener(KeybindingListener keybinding_listener) {
@@ -48,7 +51,8 @@ public class JKeybindingButton extends JToggleButton {
     private boolean keybinding_valid(int keycode_selected) {
         boolean keycode_number    = new ValueRange(KeyEvent.VK_0, KeyEvent.VK_9).check_within(keycode_selected);
         boolean keycode_character = new ValueRange(KeyEvent.VK_A, KeyEvent.VK_Z).check_within(keycode_selected);
-        return (keycode_number || keycode_character);
+        boolean keycode_blacklist = Arrays.asList(this.keycode_filter).contains(keycode_selected);
+        return (keycode_number || keycode_character) && (!keycode_blacklist);
     }
 
     private void keybinding_update(int keycode_selected) {

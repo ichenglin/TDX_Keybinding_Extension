@@ -64,8 +64,8 @@ public class KeybindingInterface {
         ));
         this.extension_interface.add(advanced_panel, this.gridbag_constraints(0, 1, 0));
         // instant upgrade
-        JKeybindingButton instantupgrade_top_button    = new JKeybindingButton(KeyEvent.VK_F);
-        JKeybindingButton instantupgrade_bottom_button = new JKeybindingButton(KeyEvent.VK_T);
+        JKeybindingButton instantupgrade_top_button    = new JKeybindingButton(KeyEvent.VK_F, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
+        JKeybindingButton instantupgrade_bottom_button = new JKeybindingButton(KeyEvent.VK_T, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
         JLabel            instantupgrade_top_label     = new JLabel("Upgrade Keybinding (Top Path)");
         JLabel            instantupgrade_bottom_label  = new JLabel("Upgrade Keybinding (Bottom Path)");
         instantupgrade_top_button   .setPreferredSize(new Dimension(15, 15));
