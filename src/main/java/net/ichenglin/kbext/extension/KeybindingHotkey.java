@@ -26,6 +26,7 @@ public class KeybindingHotkey {
 
     public void hotkey_update(int id, Integer modifiers, Integer keycode, Runnable handler) {
         HotkeyRegistry registry_data = this.hotkey_registry.get(id);
+        if (registry_data == null) return;
         int      hotkey_modifiers = (modifiers == null) ? registry_data.hotkey_modifiers : modifiers;
         int      hotkey_keycode   = (keycode   == null) ? registry_data.hotkey_keycode   : keycode;
         Runnable hotkey_handler   = (handler   == null) ? registry_data.hotkey_handler   : handler;
