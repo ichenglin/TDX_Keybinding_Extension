@@ -1,14 +1,19 @@
 package net.ichenglin.kbext.extension;
 
+import net.ichenglin.kbext.object.ProgramRegistry;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class KeybindingRobot {
-    private final Robot macro_robot;
 
-    public KeybindingRobot() {
+    private final Robot           extension_robot;
+    private final ProgramRegistry extension_registry;
+
+    public KeybindingRobot(ProgramRegistry extension_registry) {
         try {
-            this.macro_robot = new Robot();
+            this.extension_robot    = new Robot();
+            this.extension_registry = extension_registry;
         } catch (AWTException exception) {
             throw new RuntimeException("Failed to initialize robot");
         }
@@ -20,8 +25,8 @@ public class KeybindingRobot {
     }
 
     public void upgrade_once(int upgrade_keycode) {
-        this.macro_robot.keyPress  (upgrade_keycode);
-        this.macro_robot.keyRelease(upgrade_keycode);
+        this.extension_robot.keyPress  (upgrade_keycode);
+        this.extension_robot.keyRelease(upgrade_keycode);
     }
 
     public BufferedImage screenshot_capture() {
@@ -34,15 +39,16 @@ public class KeybindingRobot {
     }
 
     public BufferedImage screenshot_capture(Rectangle screen_rectangle) {
-        return this.macro_robot.createScreenCapture(screen_rectangle);
+        int version_jre = (int) this.extension_registry.get_data_default("jre_ver", 8);
+        if (version_jre >= 9) {
+            float screen_scalefactor = (Toolkit.getDefaultToolkit().getScreenResolution() / 96f);
+            screen_rectangle = new Rectangle(
+                (int) (screen_rectangle.getX()      / screen_scalefactor),
+                (int) (screen_rectangle.getY()      / screen_scalefactor),
+                (int) (screen_rectangle.getWidth()  / screen_scalefactor),
+                (int) (screen_rectangle.getHeight() / screen_scalefactor)
+            );
+        }
+        return this.extension_robot.createScreenCapture(screen_rectangle);
     }
-
-    /*private static BufferedImage image_rescale(BufferedImage image_source, int result_width, int result_height) {
-        double scale_width  = ((double) result_width  / image_source.getWidth());
-        double scale_height = ((double) result_height / image_source.getHeight());
-        BufferedImage   image_destination = new BufferedImage(result_width, result_height, image_source.getType());
-        AffineTransform scale_transform   = new AffineTransform();
-        scale_transform.scale(scale_width, scale_height);
-        return new AffineTransformOp(scale_transform, AffineTransformOp.TYPE_BICUBIC).filter(image_source, image_destination);
-    }*/
 }

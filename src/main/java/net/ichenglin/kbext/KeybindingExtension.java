@@ -13,8 +13,9 @@ import java.awt.image.BufferedImage;
 public class KeybindingExtension {
     public static void main(String[] args) {
         KeybindingReference Extension = new KeybindingReference();
+        Extension.extension_registry  = new ProgramRegistry();
         Extension.extension_hotkey    = new KeybindingHotkey();
-        Extension.extension_robot     = new KeybindingRobot();
+        Extension.extension_robot     = new KeybindingRobot(Extension.extension_registry);
         Extension.extension_hotkey.hotkey_register(1, User32.MOD_NOREPEAT, KeyEvent.VK_F, () -> {
             if (!KeybindingWindow.window_focused().get_name().equals("Roblox")) return;
             Extension.extension_robot.upgrade_max(KeyEvent.VK_E, KeyEvent.VK_R);
@@ -27,11 +28,11 @@ public class KeybindingExtension {
             if (!KeybindingWindow.window_focused().get_name().equals("Roblox")) return;
             System.out.println("Nothing Now :(");
         });
-        Extension.extension_registry    = new ProgramRegistry();
         Extension.extension_interface   = new KeybindingInterface(Extension.extension_hotkey, Extension.extension_registry);
         Extension.extension_recognition = new KeybindingRecognition("D:\\Github\\TDX_Keybinding_Extension\\asset");
         Extension.extension_gamestate   = new GameState(0, 0, 0);
         Extension.extension_registry.set_data("ext_rdy", true);
+        Extension.extension_registry.set_data("jre_ver", KeybindingExtension.version_java());
         new ScheduledTask(500, () -> KeybindingExtension.task_recognition(Extension));
     }
 
@@ -50,6 +51,10 @@ public class KeybindingExtension {
         } catch (RecognitionException exception) {
             Extension.extension_registry.set_data("ext_ocr", exception.getMessage());
         }
+    }
+
+    private static int version_java() {
+        return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
     }
 }
 

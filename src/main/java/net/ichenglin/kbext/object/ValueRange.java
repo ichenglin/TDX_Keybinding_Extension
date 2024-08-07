@@ -29,6 +29,16 @@ public class ValueRange implements Comparable<ValueRange> {
         return new ValueRange(this.range_minimum, this.range_maximum);
     }
 
+    public Integer[] get_array() {
+        int       range_minimum = this.get_minimum();
+        int       range_length  = this.get_length();
+        Integer[] range_array   = new Integer[range_length];
+        for (int number_index = 0; number_index < range_length; number_index++) {
+            range_array[number_index] = range_minimum + number_index;
+        }
+        return range_array;
+    }
+
     public int get_length() {
         return (this.range_maximum - this.range_minimum + 1);
     }

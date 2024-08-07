@@ -19,9 +19,15 @@ public class ProgramRegistry {
         ProgramRegistryData data_old = this.registry_data.put(data_key, new ProgramRegistryData(data_key, data_value));
         if (data_old != null && data_value.equals(data_old.get_value())) return;
         this.notify_listeners(new RegistryEvent(data_key));
+        if (!data_key.equals("int_upd")) this.set_data("int_upd", (int) this.get_data_default("int_upd", 0) + 1);
     }
 
     public Object get_data(String data_key) {
+        return this.registry_data.get(data_key).get_value();
+    }
+
+    public Object get_data_default(String data_key, Object data_default) {
+        if (!this.registry_data.containsKey(data_key)) return data_default;
         return this.registry_data.get(data_key).get_value();
     }
 

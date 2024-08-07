@@ -2,6 +2,7 @@ package net.ichenglin.kbext.extension;
 
 import net.ichenglin.kbext.object.ProgramRegistry;
 import net.ichenglin.kbext.object.ProgramRegistryData;
+import net.ichenglin.kbext.object.ValueRange;
 import net.ichenglin.kbext.ui.JKeybindingButton;
 
 import javax.swing.*;
@@ -257,10 +258,6 @@ class AutoSkipPreset {
     }
 
     public Integer[] get_waves_list() {
-        Integer[] waves_list = new Integer[this.gamemode_waves];
-        for (int wave_index = 0; wave_index < this.gamemode_waves; wave_index++) {
-            waves_list[wave_index] = (wave_index + 1);
-        }
-        return waves_list;
+        return new ValueRange(1, this.gamemode_waves).get_array();
     }
 }
