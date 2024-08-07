@@ -35,7 +35,7 @@ public class KeybindingInterface {
         EventQueue.invokeLater(() -> {
             this.window_initialize();
             this.general_initialize(extension_hotkey);
-            this.advanced_initialize(extension_hotkey);
+            this.keybinding_initialize(extension_hotkey);
             this.autoskip_initialize();
             this.monitor_initialize();
         });
@@ -45,7 +45,7 @@ public class KeybindingInterface {
     private void window_initialize() {
         // window
         this.extension_interface.setSize                 (660, 300);
-        this.extension_interface.setTitle                ("TDX Keybinding Extension");
+        this.extension_interface.setTitle                ("TDX Keybinding Extension (by github.com/ichenglin)");
         this.extension_interface.setResizable            (false);
         this.extension_interface.setAlwaysOnTop          (true);
         this.extension_interface.setVisible              (true);
@@ -97,15 +97,15 @@ public class KeybindingInterface {
         general_panel.add(autoskip_status,   KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
-    private void advanced_initialize(KeybindingHotkey keybinding_hotkey) {
+    private void keybinding_initialize(KeybindingHotkey keybinding_hotkey) {
         // layout
-        JPanel advanced_panel = new JPanel();
-        advanced_panel.setLayout(new GridBagLayout());
-        advanced_panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Advanced Settings"),
+        JPanel keybinding_panel = new JPanel();
+        keybinding_panel.setLayout(new GridBagLayout());
+        keybinding_panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Keybinding Settings"),
                 BorderFactory.createEmptyBorder (5, 5, 5, 5)
         ));
-        this.extension_interface.add(advanced_panel, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.BOTH, 0));
+        this.extension_interface.add(keybinding_panel, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.BOTH, 0));
         // instant upgrade
         JKeybindingButton instantupgrade_top_button    = new JKeybindingButton(KeyEvent.VK_F, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
         JKeybindingButton instantupgrade_bottom_button = new JKeybindingButton(KeyEvent.VK_T, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
@@ -125,12 +125,12 @@ public class KeybindingInterface {
         instantupgrade_top_button   .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(1, null, keybinding_event.get_new(), null));
         instantupgrade_bottom_button.addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(2, null, keybinding_event.get_new(), null));
         voteskip_button             .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(3, null, keybinding_event.get_new(), null));
-        advanced_panel.add(instantupgrade_top_button,    KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_top_label,     KeybindingInterface.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_bottom_button, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_bottom_label,  KeybindingInterface.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(voteskip_button,              KeybindingInterface.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(voteskip_label,               KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(instantupgrade_top_button,    KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(instantupgrade_top_label,     KeybindingInterface.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(instantupgrade_bottom_button, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(instantupgrade_bottom_label,  KeybindingInterface.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(voteskip_button,              KeybindingInterface.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        keybinding_panel.add(voteskip_label,               KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
     private void autoskip_initialize() {

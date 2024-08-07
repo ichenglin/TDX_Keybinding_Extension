@@ -159,25 +159,6 @@ class NeighborOccurrence implements Comparable<NeighborOccurrence> {
         this.occurrence_y.add(occurrence_y);
     }
 
-    /*public ValueRange get_densest() {
-        if (this.get_size() <= 0) return null;
-        Integer    occurrence_first   = this.occurrence_y.get(0);
-        ValueRange longest_occurrence = new ValueRange(occurrence_first, occurrence_first);
-        ValueRange current_occurrence = new ValueRange(occurrence_first, occurrence_first);
-        for (Integer loop_y : this.occurrence_y) {
-            if ((loop_y - current_occurrence.get_maximum()) == 1) {
-                // continuous
-                current_occurrence.set_maximum(loop_y);
-                if (current_occurrence.compareTo(longest_occurrence) < 0) continue;
-                longest_occurrence = current_occurrence.get_copy();
-            } else {
-                // not continuous
-                current_occurrence = new ValueRange(loop_y, loop_y);
-            }
-        }
-        return longest_occurrence;
-    }*/
-
     public ArrayList<Integer> get_occurrence() {
         return this.occurrence_y;
     }

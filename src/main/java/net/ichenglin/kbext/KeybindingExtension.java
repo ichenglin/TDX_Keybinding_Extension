@@ -33,7 +33,7 @@ public class KeybindingExtension {
         });
         Extension.extension_hotkey.hotkey_toggle(true);
         Extension.extension_registry.set_data("ext_rdy", true);
-        new ScheduledTask(500, () -> KeybindingExtension.task_recognition(Extension));
+        new ScheduledTask(200, () -> KeybindingExtension.task_recognition(Extension));
     }
 
     private static void task_recognition(KeybindingReference Extension) {
@@ -46,7 +46,7 @@ public class KeybindingExtension {
             // registry update
             Extension.extension_registry.set_data("rnd_hp",   Extension.extension_gamestate.get_health());
             Extension.extension_registry.set_data("rnd_wave", Extension.extension_gamestate.get_wave());
-            Extension.extension_registry.set_data("rnd_cdn",  Extension.extension_gamestate.get_timer());
+            Extension.extension_registry.set_data("rnd_cdn",  Extension.extension_gamestate.get_timer() % 60);
             Extension.extension_registry.set_data("ext_ocr",  "success");
         } catch (RecognitionException exception) {
             Extension.extension_registry.set_data("ext_ocr", exception.getMessage());
