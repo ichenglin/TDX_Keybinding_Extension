@@ -8,6 +8,7 @@ import net.ichenglin.kbext.ui.JKeybindingButton;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +34,7 @@ public class KeybindingInterface {
         this.extension_interface.setLayout(new GridBagLayout());
         EventQueue.invokeLater(() -> {
             this.window_initialize();
-            this.general_initialize();
+            this.general_initialize(extension_hotkey);
             this.advanced_initialize(extension_hotkey);
             this.autoskip_initialize();
             this.monitor_initialize();
@@ -43,7 +44,7 @@ public class KeybindingInterface {
 
     private void window_initialize() {
         // window
-        this.extension_interface.setSize                 (650, 300);
+        this.extension_interface.setSize                 (660, 300);
         this.extension_interface.setTitle                ("TDX Keybinding Extension");
         this.extension_interface.setResizable            (false);
         this.extension_interface.setAlwaysOnTop          (true);
@@ -51,7 +52,7 @@ public class KeybindingInterface {
         this.extension_interface.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void general_initialize() {
+    private void general_initialize(KeybindingHotkey keybinding_hotkey) {
         // layout
         JPanel general_panel = new JPanel();
         general_panel.setLayout(new GridBagLayout());
@@ -59,28 +60,41 @@ public class KeybindingInterface {
                 BorderFactory.createTitledBorder("General Settings"),
                 BorderFactory.createEmptyBorder (5, 5, 5, 5)
         ));
-        this.extension_interface.add(general_panel, this.gridbag_constraints(0, 0, 1, GridBagConstraints.BOTH, 0));
+        this.extension_interface.add(general_panel, KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.BOTH, 0));
         // instant upgrade
         JCheckBox instantupgrade_checkbox = new JCheckBox("Instant Upgrade (Keybindings)");
-        JLabel    instantupgrade_status   = new JLabel   ("Enabled");
+        JLabel    instantupgrade_status   = new JLabel();
         instantupgrade_checkbox.setSelected(true);
-        instantupgrade_status.setForeground(new Color(0x15803d));
-        general_panel.add(instantupgrade_checkbox, this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        general_panel.add(instantupgrade_status,   this.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        instantupgrade_checkbox.addItemListener((item_event) -> {
+            boolean instantupgrade_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
+            keybinding_hotkey  .hotkey_toggle(instantupgrade_enabled);
+            KeybindingInterface.status_update(instantupgrade_status, instantupgrade_enabled);
+        });
+        KeybindingInterface.status_update(instantupgrade_status, true);
+        general_panel.add(instantupgrade_checkbox, KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        general_panel.add(instantupgrade_status,   KeybindingInterface.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
         // vote skip
         JCheckBox voteskip_checkbox = new JCheckBox("Skip Wave (Keybindings)");
-        JLabel    voteskip_status   = new JLabel   ("Enabled");
+        JLabel    voteskip_status   = new JLabel();
         voteskip_checkbox.setSelected(true);
-        voteskip_status.setForeground(new Color(0x15803d));
-        general_panel.add(voteskip_checkbox, this.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
-        general_panel.add(voteskip_status,   this.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        voteskip_checkbox.addItemListener((item_event) -> {
+            boolean voteskip_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
+            KeybindingInterface.status_update(voteskip_status, voteskip_enabled);
+        });
+        KeybindingInterface.status_update(voteskip_status, true);
+        general_panel.add(voteskip_checkbox, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        general_panel.add(voteskip_status,   KeybindingInterface.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
         // auto skip
         JCheckBox autoskip_checkbox = new JCheckBox("Auto Skip Waves");
-        JLabel    autoskip_status   = new JLabel   ("Enabled");
+        JLabel    autoskip_status   = new JLabel();
         autoskip_checkbox.setSelected(true);
-        autoskip_status.setForeground(new Color(0x15803d));
-        general_panel.add(autoskip_checkbox, this.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
-        general_panel.add(autoskip_status,   this.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        autoskip_checkbox.addItemListener((item_event) -> {
+            boolean autoskip_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
+            KeybindingInterface.status_update(autoskip_status, autoskip_enabled);
+        });
+        KeybindingInterface.status_update(autoskip_status, true);
+        general_panel.add(autoskip_checkbox, KeybindingInterface.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        general_panel.add(autoskip_status,   KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
     private void advanced_initialize(KeybindingHotkey keybinding_hotkey) {
@@ -91,7 +105,7 @@ public class KeybindingInterface {
                 BorderFactory.createTitledBorder("Advanced Settings"),
                 BorderFactory.createEmptyBorder (5, 5, 5, 5)
         ));
-        this.extension_interface.add(advanced_panel, this.gridbag_constraints(0, 1, 1, GridBagConstraints.BOTH, 0));
+        this.extension_interface.add(advanced_panel, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.BOTH, 0));
         // instant upgrade
         JKeybindingButton instantupgrade_top_button    = new JKeybindingButton(KeyEvent.VK_F, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
         JKeybindingButton instantupgrade_bottom_button = new JKeybindingButton(KeyEvent.VK_T, new Integer[]{KeyEvent.VK_E, KeyEvent.VK_R});
@@ -111,12 +125,12 @@ public class KeybindingInterface {
         instantupgrade_top_button   .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(1, null, keybinding_event.get_new(), null));
         instantupgrade_bottom_button.addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(2, null, keybinding_event.get_new(), null));
         voteskip_button             .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(3, null, keybinding_event.get_new(), null));
-        advanced_panel.add(instantupgrade_top_button,    this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_top_label,     this.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_bottom_button, this.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(instantupgrade_bottom_label,  this.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(voteskip_button,              this.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
-        advanced_panel.add(voteskip_label,               this.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(instantupgrade_top_button,    KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(instantupgrade_top_label,     KeybindingInterface.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(instantupgrade_bottom_button, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(instantupgrade_bottom_label,  KeybindingInterface.gridbag_constraints(1, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(voteskip_button,              KeybindingInterface.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
+        advanced_panel.add(voteskip_label,               KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
     private void autoskip_initialize() {
@@ -127,7 +141,7 @@ public class KeybindingInterface {
                 BorderFactory.createTitledBorder("Auto Skip Settings"),
                 BorderFactory.createEmptyBorder (5, 5, 5, 5)
         ));
-        this.extension_interface.add(autoskip_panel, this.gridbag_constraints(1, 0, 2, GridBagConstraints.BOTH, 0));
+        this.extension_interface.add(autoskip_panel, KeybindingInterface.gridbag_constraints(1, 0, 2, GridBagConstraints.BOTH, 0));
         // skip waves
         String[]          autoskip_modes    = KeybindingInterface.autoskip_presets.stream().map((preset) -> preset.get_name() + " (" + preset.get_waves() + ")").toArray(String[]::new);
         JComboBox<String> autoskip_combo    = new JComboBox<String>(autoskip_modes);
@@ -144,8 +158,8 @@ public class KeybindingInterface {
             autoskip_list.setListData(this.extension_mode_autoskip.get_waves_list());
             this.extension_registry.set_data("int_wave", this.extension_mode_autoskip);
         });
-        autoskip_panel.add(autoskip_combo,    this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
-        autoskip_panel.add(autoskip_scroller, this.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
+        autoskip_panel.add(autoskip_combo,    KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        autoskip_panel.add(autoskip_scroller, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
     private void monitor_initialize() {
@@ -156,15 +170,15 @@ public class KeybindingInterface {
                 BorderFactory.createTitledBorder("Program Registry"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
-        this.extension_interface.add(monitor_panel, this.gridbag_constraints(2, 0, 2, GridBagConstraints.BOTH, 0));
+        this.extension_interface.add(monitor_panel, KeybindingInterface.gridbag_constraints(2, 0, 2, GridBagConstraints.BOTH, 0));
         JTable       monitor_table         = new JTable(new RegistryTableModel(this.extension_registry));
         JScrollPane  monitor_scroller      = new JScrollPane(monitor_table);
         monitor_table.setFillsViewportHeight(true);
         monitor_scroller.setPreferredSize   (new Dimension(150, 180));
-        monitor_panel.add(monitor_scroller, this.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
+        monitor_panel.add(monitor_scroller, KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
     }
 
-    private GridBagConstraints gridbag_constraints(int grid_x, int grid_y, int grid_height, int grid_fill, int pad_right) {
+    private static GridBagConstraints gridbag_constraints(int grid_x, int grid_y, int grid_height, int grid_fill, int pad_right) {
         GridBagConstraints layout_constraints = new GridBagConstraints();
         layout_constraints.gridx      = grid_x;
         layout_constraints.gridy      = grid_y;
@@ -172,6 +186,17 @@ public class KeybindingInterface {
         layout_constraints.fill       = grid_fill;
         layout_constraints.insets     = new Insets(2, 3, 2, 3 + pad_right);
         return layout_constraints;
+    }
+
+    private static void status_update(JLabel status_label, boolean status_enabled) {
+        if (status_enabled) {
+            status_label.setText("Enabled");
+            status_label.setForeground(new Color(0x15803d));
+        } else {
+            status_label.setText("Disabled");
+            status_label.setForeground(new Color(0xb91c1c));
+        }
+        status_label.setPreferredSize(new Dimension(50, 15));
     }
 }
 

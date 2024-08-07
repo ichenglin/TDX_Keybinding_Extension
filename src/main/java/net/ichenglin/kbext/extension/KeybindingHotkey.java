@@ -10,18 +10,18 @@ public class KeybindingHotkey {
 
     private final HashMap<Integer, HotkeyRegistry> hotkey_registry;
     private       KeybindingHotkeyThread           hotkey_thread;
+    private       boolean                          hotkey_enabled;
 
     public KeybindingHotkey() {
         this.hotkey_registry = new HashMap<Integer, HotkeyRegistry>();
+        this.hotkey_enabled  = false;
     }
 
     public void hotkey_register(int id, int modifiers, int keycode, Runnable handler) {
-        try {
-            if (this.hotkey_thread != null) this.hotkey_thread.hotkey_stop();
-            this.hotkey_registry.put(id, new HotkeyRegistry(id, modifiers, keycode, handler));
-            this.hotkey_thread = new KeybindingHotkeyThread(this.hotkey_registry);
-            this.hotkey_thread.hotkey_start();
-        } catch (InterruptedException ignored) {}
+        boolean hotkey_enabled = this.hotkey_enabled;
+        if (hotkey_enabled) this.hotkey_toggle(false);
+        this.hotkey_registry.put(id, new HotkeyRegistry(id, modifiers, keycode, handler));
+        if (hotkey_enabled) this.hotkey_toggle(true);
     }
 
     public void hotkey_update(int id, Integer modifiers, Integer keycode, Runnable handler) {
@@ -31,6 +31,19 @@ public class KeybindingHotkey {
         int      hotkey_keycode   = (keycode   == null) ? registry_data.hotkey_keycode   : keycode;
         Runnable hotkey_handler   = (handler   == null) ? registry_data.hotkey_handler   : handler;
         this.hotkey_register(id, hotkey_modifiers, hotkey_keycode, hotkey_handler);
+    }
+
+    public void hotkey_toggle(boolean hotkey_enabled) {
+        if (this.hotkey_enabled == hotkey_enabled) return;
+        try {
+            if (hotkey_enabled) {
+                this.hotkey_thread = new KeybindingHotkeyThread(this.hotkey_registry);
+                this.hotkey_thread.hotkey_start();
+            } else if (this.hotkey_thread != null) {
+                this.hotkey_thread.hotkey_stop();
+            }
+        } catch (InterruptedException ignored) {}
+        this.hotkey_enabled = hotkey_enabled;
     }
 }
 

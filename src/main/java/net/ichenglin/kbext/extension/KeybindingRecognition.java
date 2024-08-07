@@ -4,6 +4,7 @@ import net.ichenglin.kbext.object.GameState;
 import net.ichenglin.kbext.object.RecognitionException;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import net.sourceforge.tess4j.util.LoadLibs;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -21,10 +22,10 @@ public class KeybindingRecognition {
 
     private static final int SCOREBOARD_BACKGROUND = 0xFF191919;
 
-    public KeybindingRecognition(String recognition_data_path) {
+    public KeybindingRecognition() {
         this.recognition_instance = new Tesseract();
         // initialize tesseract
-        this.recognition_instance.setDatapath(recognition_data_path);
+        this.recognition_instance.setDatapath(LoadLibs.extractTessResources("tessdata").getAbsolutePath());
         this.recognition_instance.setLanguage("eng");
         this.recognition_instance.setTessVariable("user_defined_dpi", "70");
     }
