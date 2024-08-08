@@ -14,7 +14,7 @@ public class ScheduledTask {
     public ScheduledTask(int task_delay_initial, int task_delay, Runnable task_runnable) {
         this.task_runnable  = task_runnable;
         this.task_scheduler = Executors.newScheduledThreadPool(1);
-        this.task_handle    = this.task_scheduler.scheduleWithFixedDelay(() -> {
+        this.task_handle    = this.task_scheduler.scheduleAtFixedRate(() -> {
             try {
                 this.task_runnable.run();
             } catch (Exception exception) {
