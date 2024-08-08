@@ -7,6 +7,7 @@ import com.sun.jna.platform.win32.WinDef.RECT;
 import net.ichenglin.kbext.util.DwmApi;
 
 import java.awt.*;
+import java.util.concurrent.Callable;
 
 public class KeybindingWindow {
 
@@ -36,9 +37,30 @@ public class KeybindingWindow {
         return new Rectangle(window_rectangle_x, window_rectangle_y, window_rectangle_width, window_rectangle_height);
     }
 
+    public static KeybindingWindow window_named_fallback(String window_name) {
+        Callable<KeybindingWindow>[] window_fallbacks = new Callable[] {
+            () -> KeybindingWindow.window_named(window_name),
+            () -> KeybindingWindow.window_focused()
+        };
+        for (Callable<KeybindingWindow> window_fallback : window_fallbacks) {
+            try {
+                KeybindingWindow window_found = window_fallback.call();
+                if (window_found != null) return window_found;
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
+    public static KeybindingWindow window_named(String window_name) {
+        HWND window_handle = User32.INSTANCE.FindWindow(null, window_name);
+        if (window_handle == null) return null;
+        return new KeybindingWindow(window_handle);
+    }
+
     public static KeybindingWindow window_focused() {
-        HWND focused_window = User32.INSTANCE.GetForegroundWindow();
-        return new KeybindingWindow(focused_window);
+        HWND window_handle = User32.INSTANCE.GetForegroundWindow();
+        if (window_handle == null) return null;
+        return new KeybindingWindow(window_handle);
     }
 
     @Override

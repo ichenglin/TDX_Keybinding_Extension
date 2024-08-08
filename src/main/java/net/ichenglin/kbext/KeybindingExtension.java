@@ -33,14 +33,15 @@ public class KeybindingExtension {
         });
         Extension.extension_hotkey.hotkey_toggle(true);
         Extension.extension_registry.set_data("ext_rdy", true);
-        new ScheduledTask(200, () -> KeybindingExtension.task_recognition(Extension));
+        new ScheduledTask(500, 200, () -> KeybindingExtension.task_recognition(Extension));
     }
 
     private static void task_recognition(KeybindingReference Extension) {
         try {
-            KeybindingWindow window_focused    = KeybindingWindow.window_focused();
-            BufferedImage    window_screenshot = Extension.extension_robot.screenshot_capture(window_focused.get_bounds());
-            Extension.extension_registry   .set_data ("ext_wnd", window_focused);
+            KeybindingWindow window_roblox = KeybindingWindow.window_named_fallback("Roblox");
+            if (window_roblox == null) throw new RecognitionException("err_wnf");
+            BufferedImage window_screenshot = Extension.extension_robot.screenshot_capture(window_roblox.get_bounds());
+            Extension.extension_registry   .set_data ("ext_wnd", window_roblox);
             Extension.extension_recognition.set_image(window_screenshot);
             Extension.extension_gamestate = Extension.extension_recognition.recognize_state();
             // registry update

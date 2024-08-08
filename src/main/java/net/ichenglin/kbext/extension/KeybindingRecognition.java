@@ -91,6 +91,8 @@ public class KeybindingRecognition {
         int scoreboard_width  = occurrence_best.get_length();
         int scoreboard_height = occurrence_list.get(occurrence_list.size() - 1);
         int scoreboard_x      = (recognition_width_center - (scoreboard_width / 2));
+        if (scoreboard_width  <= 0) scoreboard_width  = 1;
+        if (scoreboard_height <= 0) scoreboard_height = 1;
         return new Rectangle(scoreboard_x, 0, scoreboard_width, scoreboard_height);
     }
 
