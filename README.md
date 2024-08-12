@@ -1,6 +1,6 @@
 <div align="center">
 	<h1>TDX Keybinding Extension (Pre-Alpha)</h1>
-	<p>Keybinding extension offers players customizable hotkeys for instant upgrades, wave skipping, and an automatic skip wave macro.</p>
+	<p>Customizable hotkeys for instant upgrades, wave skipping, and an automatic skip wave macro.</p>
 	<img src="https://raw.githubusercontent.com/ichenglin/TDX_Keybinding_Extension/main/asset/extension_demo.png" alt="Extension Demo">
 </div>
 
