@@ -23,7 +23,8 @@ public class ProgramRegistry {
     }
 
     public Object get_data(String data_key) {
-        return this.registry_data.get(data_key).get_value();
+        ProgramRegistryData data_accessed = this.registry_data.get(data_key);
+        return ((data_accessed != null) ? data_accessed.get_value() : null);
     }
 
     public Object get_data_default(String data_key, Object data_default) {

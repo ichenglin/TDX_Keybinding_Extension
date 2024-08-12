@@ -10,6 +10,7 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,7 +68,8 @@ public class KeybindingInterface {
         instantupgrade_checkbox.setSelected(true);
         instantupgrade_checkbox.addItemListener((item_event) -> {
             boolean instantupgrade_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
-            keybinding_hotkey  .hotkey_toggle(instantupgrade_enabled);
+            keybinding_hotkey  .hotkey_update(1, null, null, instantupgrade_enabled, null);
+            keybinding_hotkey  .hotkey_update(2, null, null, instantupgrade_enabled, null);
             KeybindingInterface.status_update(instantupgrade_status, instantupgrade_enabled);
         });
         KeybindingInterface.status_update(instantupgrade_status, true);
@@ -79,6 +81,7 @@ public class KeybindingInterface {
         voteskip_checkbox.setSelected(true);
         voteskip_checkbox.addItemListener((item_event) -> {
             boolean voteskip_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
+            keybinding_hotkey  .hotkey_update(3, null, null, voteskip_enabled, null);
             KeybindingInterface.status_update(voteskip_status, voteskip_enabled);
         });
         KeybindingInterface.status_update(voteskip_status, true);
@@ -87,12 +90,13 @@ public class KeybindingInterface {
         // auto skip
         JCheckBox autoskip_checkbox = new JCheckBox("Auto Skip Waves");
         JLabel    autoskip_status   = new JLabel();
-        autoskip_checkbox.setSelected(true);
+        autoskip_checkbox.setSelected(false);
+        autoskip_checkbox.setEnabled(false);
         autoskip_checkbox.addItemListener((item_event) -> {
             boolean autoskip_enabled = (item_event.getStateChange() == ItemEvent.SELECTED);
             KeybindingInterface.status_update(autoskip_status, autoskip_enabled);
         });
-        KeybindingInterface.status_update(autoskip_status, true);
+        KeybindingInterface.status_update(autoskip_status, false);
         general_panel.add(autoskip_checkbox, KeybindingInterface.gridbag_constraints(0, 2, 1, GridBagConstraints.HORIZONTAL, 0));
         general_panel.add(autoskip_status,   KeybindingInterface.gridbag_constraints(1, 2, 1, GridBagConstraints.HORIZONTAL, 0));
     }
@@ -122,9 +126,9 @@ public class KeybindingInterface {
         instantupgrade_top_button   .setMargin(new Insets(0, 0, 0, 0));
         instantupgrade_bottom_button.setMargin(new Insets(0, 0, 0, 0));
         voteskip_button             .setMargin(new Insets(0, 0, 0, 0));
-        instantupgrade_top_button   .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(1, null, keybinding_event.get_new(), null));
-        instantupgrade_bottom_button.addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(2, null, keybinding_event.get_new(), null));
-        voteskip_button             .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(3, null, keybinding_event.get_new(), null));
+        instantupgrade_top_button   .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(1, null, keybinding_event.get_new(), null, null));
+        instantupgrade_bottom_button.addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(2, null, keybinding_event.get_new(), null, null));
+        voteskip_button             .addKeybindingListener((keybinding_event) -> keybinding_hotkey.hotkey_update(3, null, keybinding_event.get_new(), null, null));
         keybinding_panel.add(instantupgrade_top_button,    KeybindingInterface.gridbag_constraints(0, 0, 1, GridBagConstraints.HORIZONTAL, 0));
         keybinding_panel.add(instantupgrade_top_label,     KeybindingInterface.gridbag_constraints(1, 0, 1, GridBagConstraints.HORIZONTAL, 0));
         keybinding_panel.add(instantupgrade_bottom_button, KeybindingInterface.gridbag_constraints(0, 1, 1, GridBagConstraints.HORIZONTAL, 0));
@@ -250,6 +254,7 @@ class RegistryTableModel extends AbstractTableModel {
     }
 
     private static Object value_translate(Object value_original) {
+        if (value_original instanceof Point2D) return "(" + ((Point2D) value_original).getX() + ", " + ((Point2D) value_original).getY() + ")";
         try {
             Class<?> stringify_class = value_original.getClass().getMethod("toString").getDeclaringClass();
             if (stringify_class != Object.class) return value_original;

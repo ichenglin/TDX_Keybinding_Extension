@@ -12,6 +12,22 @@ public class Geometry {
         return (within_x && within_y);
     }
 
+    public static Rectangle point_to_rectangle(Point2D point, int radius) {
+        return new Rectangle(
+            (int) (point.getX() - radius),
+            (int) (point.getY() - radius),
+            (radius * 2),
+            (radius * 2)
+        );
+    }
+
+    public static Point point_scale_origin(Point rectangle, double scale) {
+        return new Point(
+                (int) (rectangle.x * scale),
+                (int) (rectangle.y * scale)
+        );
+    }
+
     public static Rectangle rectangle_scale_origin(Rectangle rectangle, double scale) {
         return new Rectangle(
             (int) (rectangle.getX()      * scale),

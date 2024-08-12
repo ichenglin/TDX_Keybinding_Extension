@@ -39,6 +39,10 @@ public class ValueRange implements Comparable<ValueRange> {
         return range_array;
     }
 
+    public double get_mean() {
+        return ((this.range_minimum + this.range_maximum) / 2f);
+    }
+
     public int get_length() {
         return (this.range_maximum - this.range_minimum + 1);
     }

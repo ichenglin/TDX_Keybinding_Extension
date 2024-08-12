@@ -2,6 +2,7 @@ package net.ichenglin.kbext.extension;
 
 import net.ichenglin.kbext.object.GameState;
 import net.ichenglin.kbext.object.RecognitionException;
+import net.ichenglin.kbext.object.ValueRange;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import net.sourceforge.tess4j.util.LoadLibs;
@@ -20,7 +21,9 @@ public class KeybindingRecognition {
     private       int           recognition_width;
     private       int           recognition_height;
 
-    private static final int SCOREBOARD_BACKGROUND = 0xFF191919;
+    private static final int BACKGROUND_SCOREBOARD      = 0xFF191919;
+    private static final int BACKGROUND_VOTESKIP_ACCEPT = 0xFF90CC00;
+    private static final int BACKGROUND_VOTESKIP_REJECT = 0xFFB42B2B;
 
     public KeybindingRecognition() {
         this.recognition_instance = new Tesseract();
@@ -74,12 +77,12 @@ public class KeybindingRecognition {
 
     public Rectangle locate_scoreboard() throws RecognitionException {
         int recognition_width_center = (this.recognition_width  / 2);
-        int recognition_height_limit = (this.recognition_height / 4);
+        int recognition_height_limit = (this.recognition_height / 2);
         HashMap<Integer, NeighborOccurrence> neighbor_occurrences = new HashMap<Integer, NeighborOccurrence>();
         NeighborOccurrence occurrence_best = new NeighborOccurrence(0);
         for (int pixel_y = 0; pixel_y < recognition_height_limit; pixel_y++) {
             int pixel_argb = this.recognition_image.getRGB(recognition_width_center, pixel_y);
-            if (pixel_argb != KeybindingRecognition.SCOREBOARD_BACKGROUND) continue;
+            if (pixel_argb != KeybindingRecognition.BACKGROUND_SCOREBOARD) continue;
             int pixel_neighbors = this.locate_scoreboard_neighbors(recognition_width_center, pixel_y);
             neighbor_occurrences.putIfAbsent(pixel_neighbors, new NeighborOccurrence(pixel_neighbors));
             NeighborOccurrence neighbor_occurrence = neighbor_occurrences.get(pixel_neighbors);
@@ -96,6 +99,32 @@ public class KeybindingRecognition {
         return new Rectangle(scoreboard_x, 0, scoreboard_width, scoreboard_height);
     }
 
+    public Point[] locate_skipwave(Point window_location) throws RecognitionException {
+        Rectangle  scoreboard_rectangle     = this.locate_scoreboard();
+        int        recognition_width_center = (this.recognition_width  / 2);
+        int        recognition_height_limit = (this.recognition_height / 2);
+        int        skip_offset_x            = (int) (scoreboard_rectangle.getWidth() * 0.55f);
+        int        skip_reject_x            = (recognition_width_center - skip_offset_x);
+        int        skip_accept_x            = (recognition_width_center + skip_offset_x);
+        ValueRange range_best               = null;
+        ValueRange range_current            = null;
+        for (int pixel_y = 0; pixel_y < recognition_height_limit; pixel_y++) {
+            if (this.recognition_image.getRGB(skip_reject_x, pixel_y) != KeybindingRecognition.BACKGROUND_VOTESKIP_REJECT) continue;
+            if (this.recognition_image.getRGB(skip_accept_x, pixel_y) != KeybindingRecognition.BACKGROUND_VOTESKIP_ACCEPT) continue;
+            boolean current_continuous = (range_current != null) && ((range_current.get_maximum() - pixel_y) <= 1);
+            if (current_continuous) range_current.set_maximum(pixel_y);
+            else                    range_current = new ValueRange(pixel_y, pixel_y);
+            boolean current_greater = (range_best == null) || (range_best.get_length() < range_current.get_length());
+            if (current_greater) range_best = range_current.get_copy();
+        }
+        if (range_best == null) throw new RecognitionException("err_loc");
+        int skip_y = (int) range_best.get_mean();
+        return new Point[] {
+            new Point((window_location.x + skip_reject_x), (window_location.y + skip_y)),
+            new Point((window_location.x + skip_accept_x), (window_location.y + skip_y)),
+        };
+    }
+
     public void set_image(BufferedImage recognition_image) {
         this.recognition_image    = recognition_image;
         this.recognition_width    = recognition_image.getWidth();
@@ -106,12 +135,12 @@ public class KeybindingRecognition {
         int pixel_neighbors = 1;
         for (int neighbor_x = (pixel_x-1); neighbor_x >= 0; neighbor_x--) {
             int pixel_argb = this.recognition_image.getRGB(neighbor_x, pixel_y);
-            if (pixel_argb != KeybindingRecognition.SCOREBOARD_BACKGROUND) break;
+            if (pixel_argb != KeybindingRecognition.BACKGROUND_SCOREBOARD) break;
             pixel_neighbors++;
         }
         for (int neighbor_x = (pixel_x+1); neighbor_x < this.recognition_width; neighbor_x++) {
             int pixel_argb = this.recognition_image.getRGB(neighbor_x, pixel_y);
-            if (pixel_argb != KeybindingRecognition.SCOREBOARD_BACKGROUND) break;
+            if (pixel_argb != KeybindingRecognition.BACKGROUND_SCOREBOARD) break;
             pixel_neighbors++;
         }
         return pixel_neighbors;

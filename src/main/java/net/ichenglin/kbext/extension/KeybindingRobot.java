@@ -4,10 +4,10 @@ import net.ichenglin.kbext.object.ProgramRegistry;
 import net.ichenglin.kbext.util.Geometry;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 
 public class KeybindingRobot {
 
@@ -33,13 +33,15 @@ public class KeybindingRobot {
         this.extension_robot.keyRelease(upgrade_keycode);
     }
 
-    public BufferedImage screenshot_capture() {
-        Rectangle        screen_rectangle = new Rectangle(0, 0, 0, 0);
-        GraphicsDevice[] screen_devices   = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-        for (GraphicsDevice loop_device : screen_devices) {
-            screen_rectangle = screen_rectangle.union(loop_device.getDefaultConfiguration().getBounds());
-        }
-        return this.screenshot_capture(screen_rectangle);
+    public void click_once(Point mouse_location) {
+        this.extension_robot.mouseRelease(KeyEvent.BUTTON2_MASK);
+        this.extension_robot.mouseRelease(KeyEvent.BUTTON1_MASK);
+        // TODO: Robot.mouseMove doesn't work with multiple screen display
+        this.extension_robot.mouseMove   (mouse_location.x, mouse_location.y + 1);
+        this.extension_robot.delay       (10);
+        this.extension_robot.mouseMove   (mouse_location.x, mouse_location.y);
+        this.extension_robot.mousePress  (KeyEvent.BUTTON1_MASK);
+        this.extension_robot.mouseRelease(KeyEvent.BUTTON1_MASK);
     }
 
     public BufferedImage screenshot_capture(Rectangle window_rectangle) {
